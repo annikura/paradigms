@@ -18,7 +18,7 @@ def main(sz):
     parser = argparse.ArgumentParser(
              description='Detects similar files in a given directory')
     parser.add_argument('dir', help='directory path')
-    parser.add_argument('--size', '-s', type=int, default=512,
+    parser.add_argument('--size', '-s', type=int, default=10 ** 5,
                         help='size of a block to read files by')
 
     args = parser.parse_args()
