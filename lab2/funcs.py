@@ -1,6 +1,6 @@
 import hashlib
 import os
-from itertools import product
+from collections import defaultdict
 
 
 def take_hash(filename, read_length=10 ** 5):
@@ -18,12 +18,9 @@ def find_similar(files, read_length=10 ** 5):
     """
     Takes a list of files and returns lists of equal by content
     """
-    eqls = {}
+    eqls = defaultdict(list)
     for file in files:
-        try:
-            eqls[take_hash(file, read_length)].append(file)
-        except KeyError:
-            eqls[take_hash(file, read_length)] = [file]
+        eqls[take_hash(file, read_length)].append(file)
     return [eqls[key] for key in eqls if len(eqls[key]) > 1]
 
 
@@ -41,5 +38,5 @@ def get_file_names(directory, check=filter_files):
     """
     ret = []
     for root, _, files in os.walk(directory, topdown=False):
-        ret.extend(product([root + os.path.sep], check(files)))
-    return map(lambda x: x[0] + x[1], ret)
+        ret.extend(map(lambda x: os.path.join(root, x), check(files)))
+    return filter(lambda s: not os.path.islink(s), ret)
