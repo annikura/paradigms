@@ -4,7 +4,7 @@
 # Рѣализуйте мѣтоды с raise NotImplementedError
 
 
-class Scope(dict):
+class Scope:
     """Scope - представляет доступ к значениям по именам
     (к функциям и именованным константам).
     Scope может иметь родителя, и если поиск по имени
@@ -15,11 +15,15 @@ class Scope(dict):
     """
 
     def __getitem__(self, item):
-        if item in self:
-            return dict.__getitem__(self, item)
-        return self.__parent.__getitem__(item)
+        if item in self.field:
+            return self.field[item]
+        return self.__parent[item]
+
+    def __setitem__(self, key, value):
+        self.field[key] = value
 
     def __init__(self, parent=None):
+        self.field = dict()
         self.__parent = parent
 
 
@@ -68,8 +72,9 @@ class ExprList:
 
     def evaluate(self, scope):
         cur = None
-        for expr in self.exprs:
-            cur = expr.evaluate(scope)
+        if self.exprs:
+            for expr in self.exprs:
+                cur = expr.evaluate(scope)
         return cur
 
 
