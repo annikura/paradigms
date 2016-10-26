@@ -25,7 +25,18 @@ class ExpressionTerm:
         if binary.rhs.is_below_zero():
             right = "(" + right + ")"
 
-        return  left + " " + binary.op + " " + right
+        return left + " " + binary.op + " " + right
+
+    def visit_call(self, call):
+        ret = call.fun_expr.access(self) + "(" + \
+              ", ".join(arg.access(self) for arg in call.args) + ")"
+        return ret
+
+    def visit_print(self, prnt):
+        return "print " + prnt.expr.access(self)
+
+    def visit_read(self, rd):
+        return "read " + rd.name
 
 
 class PrettyPrinter:
@@ -39,15 +50,15 @@ class PrettyPrinter:
         return [self.expTrm.visit(num) + ";"]
 
     def visit_print(self, prnt):
-        return ["print " + self.expTrm.visit(prnt.expr) + ";"]
+        return [self.expTrm.visit(prnt) + ";"]
 
     def visit_read(self, rd):
-        return ["read " + rd.name + ';']
+        return [self.expTrm.visit(rd) + ';']
 
     def visit_conditional(self, cond):
         ret = ["if (" + self.expTrm.visit(cond.condition) + ") {"] + \
               cond.if_true.access(self)
-        if cond.if_false.exprs:
+        if cond.if_false.list_exists():
             ret += ["} else {"] + cond.if_false.access(self)
         ret += ["};"]
         return ret
@@ -75,7 +86,5 @@ class PrettyPrinter:
         return [self.expTrm.visit(unary) + ';']
 
     def visit_call(self, call):
-        ret = [self.expTrm.visit(call.fun_expr) + "("
-               + ", ".join(self.expTrm.visit(arg) for arg in call.args) + ");"]
-        return ret
+        return [self.expTrm.visit(call) + ";"]
 

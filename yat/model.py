@@ -20,6 +20,9 @@ class Operator:
     def get_name(self):
         return None
 
+    def list_exists(self):
+        return False
+
 
 class Scope:
     def __getitem__(self, item):
@@ -68,6 +71,9 @@ class ExprList(Operator):
 
     def access(self, visitor):
         return visitor.visit_exprlist(self)
+
+    def list_exists(self):
+        return self.exprs is not None
 
 
 class Function(Operator):
