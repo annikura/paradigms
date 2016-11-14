@@ -1,35 +1,35 @@
 head' :: [a] -> a 
-head' (xs : x) = xs
+head' (x : xs) = x
 
 tail' :: [a] -> [a]
 tail' [] = []
-tail' (xs : x) = x
+tail' (x : xs) = xs
 
 take' :: Int -> [a] -> [a]
 take' 0 xs = []
 take' left [] = []
-take' left l = head' l : take' (left - 1) (tail' l)
+take' left (x : xs) = x : take' (left - 1) xs
 
 drop' :: Int -> [a] -> [a]
 drop' 0 l = l
 drop' left [] = []
-drop' left l = drop' (left - 1) (tail' l)
+drop' left (x : xs) = drop' (left - 1) xs
 
 filter' :: (a -> Bool) -> [a] -> [a]
 filter' f [] = [] 
-filter' f l = if f (head' l)
-              then head' l : filter' f (tail' l)
-              else filter' f (tail' l)
+filter' f (x : xs) = if f x
+              then x : filter' f xs
+              else filter' f xs
 
 foldl' :: (a -> b -> a) -> a -> [b] -> a
 foldl' f z [] = z
-foldl' f z l = foldl' f (f z (head' l)) (tail' l) 
+foldl' f z (x : xs) = foldl' f (f z x) xs 
 
 concat' :: [a] -> [a] -> [a]
 concat' [] l = l
-concat' l1 l2 = head' l1 : concat' (tail' l1) l2
+concat' (x : xs) l = x : concat' xs l
 
 quickSort' :: Ord a => [a] -> [a]
 quickSort' [] = []
 quickSort' (x : []) = x : []
-quickSort' (x : l) = concat' (quickSort' (filter' (\ h -> h <= x) l))  (x : (quickSort' (filter' (\ h -> h > x) l))) 
+quickSort' (x : l) = concat' (quickSort' (filter' (<= x) l))  (x : (quickSort' (filter' (> x) l))) 
