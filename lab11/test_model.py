@@ -88,6 +88,12 @@ class ReadTest(TestTemplate):
 
 
 class ConditionalTest(TestTemplate):
+    def test_false_none_underfull(self):
+        Conditional(Number(0), None)
+
+    def test_true_none_underfull(self):
+        Conditional(Number(1), None)
+
     def test_false_underfull(self):
         Conditional(Number(0), [])
 
@@ -141,8 +147,7 @@ class ConditionalTest(TestTemplate):
 
 class FunctionCallTest(TestTemplate):
     def test_empty(self):
-        f = Function([], [])
-        FunctionCall(FunctionDefinition("foo", f),
+        FunctionCall(FunctionDefinition("foo", Function([], [])),
                      []).evaluate(self.scope)
 
     def test_scope_references(self):
@@ -166,7 +171,7 @@ class BinaryOperationTest(TestTemplate):
                  '*': lambda x, y: x * y,
                  '/': lambda x, y: x // y,
                  '%': lambda x, y: x % y,
-                }
+                 }
     __binary = {'==': lambda x, y: x == y,
                 '!=': lambda x, y: x != y,
                 '<': lambda x, y: x < y,
@@ -206,6 +211,9 @@ class UnaryOperationTest(TestTemplate):
 
 
 class FunctionTest(TestTemplate):
+    def test_no_action(self):
+        Function([], [])
+
     def test_empty(self):
         Function([], []).evaluate(self.scope)
 
@@ -239,7 +247,7 @@ class FunctionTest(TestTemplate):
 
 class FunctionDefinitionTest(TestTemplate):
     def test_def(self):
-        f = Function(["a"], [Number(10)])
+        f = Function([], [])
         FunctionDefinition("function", f).evaluate(self.scope)
         self.assertIs(self.scope["function"], f)
 
