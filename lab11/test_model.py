@@ -66,17 +66,17 @@ class ScopeTest(TestTemplate):
 class PrintTest(TestTemplate):
     def test_print_positive(self):
         number = Number(self.a)
-        number.evaluate = MagicMock(return_value=Number(self.a))
+        number.evaluate = MagicMock(return_value=number)
         self.assertEqual(self.get_val(number), self.a)
 
     def test_print_negative(self):
         number = Number(self.c)
-        number.evaluate = MagicMock(return_value=Number(self.c))
+        number.evaluate = MagicMock(return_value=number)
         self.assertEqual(self.get_val(number), self.c)
 
     def test_print_return(self):
         number = Number(self.c)
-        number.evaluate = MagicMock(return_value=Number(self.c))
+        number.evaluate = MagicMock(return_value=number)
         number = Print(number).evaluate(self.scope)
         sys.stdout = io.StringIO()
         self.assertEqual(self.get_val(number), self.c)
@@ -88,6 +88,12 @@ class ReadTest(TestTemplate):
 
 
 class ConditionalTest(TestTemplate):
+    def test_false_underfull(self):
+        Conditional(Number(0), [])
+
+    def test_true_underfull(self):
+        Conditional(Number(1), [])
+
     def test_false_empties(self):
         Conditional(Number(0), [], [])
 
@@ -98,22 +104,22 @@ class ConditionalTest(TestTemplate):
         Conditional(Number(0), None, None)
 
     def test_true_nones(self):
-        Conditional(Number(1), None, None)
+        Conditional(Number(17), None, None)
 
     def test_false_comb1(self):
         Conditional(Number(0), None, [])
 
     def test_true_comb1(self):
-        Conditional(Number(1), None, [])
+        Conditional(Number(48), None, [])
 
     def test_false_comb2(self):
         Conditional(Number(0), None, [])
 
     def test_true_comb2(self):
-        Conditional(Number(1), None, [])
+        Conditional(Number(34), None, [])
 
     def test_true_none(self):
-        self.assertEqual(self.get_val(Conditional(Number(1), [Number(self.a)], None)),
+        self.assertEqual(self.get_val(Conditional(Number(-9), [Number(self.a)], None)),
                          self.a)
 
     def test_false_none(self):
@@ -166,15 +172,15 @@ class BinaryOperationTest(TestTemplate):
              '>': lambda x, y: x > y,
              '<=': lambda x, y: x <= y,
              '>=': lambda x, y: x >= y,
-             '&&': lambda x, y: x and y,
-             '||': lambda x, y: x or y,
+             '&&': lambda x, y: bool(x and y),
+             '||': lambda x, y: bool(x or y),
              }
 
     def test_binary(self):
         for op in self.__ops:
             for i in range(-10, 11):
                 for j in range(-10, 11):
-                    if j != 0:
+                    if op not in ['/', '%'] or j != 0:
                         self.assertEqual(self.get_val(BinaryOperation(Number(i), op, Number(j))),
                                          self.__ops[op](i, j))
 
