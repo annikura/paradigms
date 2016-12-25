@@ -161,40 +161,48 @@ class ReferenceTest(TestTemplate):
 
 
 class BinaryOperationTest(TestTemplate):
-    __ops = {'+': lambda x, y: x + y,
-             '-': lambda x, y: x - y,
-             '*': lambda x, y: x * y,
-             '/': lambda x, y: x // y,
-             '%': lambda x, y: x % y,
-             '==': lambda x, y: x == y,
-             '!=': lambda x, y: x != y,
-             '<': lambda x, y: x < y,
-             '>': lambda x, y: x > y,
-             '<=': lambda x, y: x <= y,
-             '>=': lambda x, y: x >= y,
-             '&&': lambda x, y: bool(x and y),
-             '||': lambda x, y: bool(x or y),
-             }
+    __numeral = {'+': lambda x, y: x + y,
+                 '-': lambda x, y: x - y,
+                 '*': lambda x, y: x * y,
+                 '/': lambda x, y: x // y,
+                 '%': lambda x, y: x % y,
+                }
+    __binary = {'==': lambda x, y: x == y,
+                '!=': lambda x, y: x != y,
+                '<': lambda x, y: x < y,
+                '>': lambda x, y: x > y,
+                '<=': lambda x, y: x <= y,
+                '>=': lambda x, y: x >= y,
+                '&&': lambda x, y: bool(x and y),
+                '||': lambda x, y: bool(x or y),
+                }
 
     def test_binary(self):
-        for op in self.__ops:
+        for op in self.__binary:
+            for i in range(-10, 11):
+                for j in range(-10, 11):
+                    self.assertEqual(bool(self.get_val(BinaryOperation(Number(i), op, Number(j)))),
+                                     self.__binary[op](i, j))
+
+    def test_numeral(self):
+        for op in self.__numeral:
             for i in range(-10, 11):
                 for j in range(-10, 11):
                     if op not in ['/', '%'] or j != 0:
                         self.assertEqual(self.get_val(BinaryOperation(Number(i), op, Number(j))),
-                                         self.__ops[op](i, j))
+                                         self.__numeral[op](i, j))
 
 
 class UnaryOperationTest(TestTemplate):
-    __ops = {'!': lambda x: not x,
-             '-': lambda x: -x
-             }
+    def test_minus(self):
+        for i in range(-10, 10):
+            self.assertEqual(self.get_val(UnaryOperation('-', Number(i))),
+                             -i)
 
-    def test_unary(self):
-        for op in self.__ops:
-            for i in range(-10, 10):
-                self.assertEqual(self.get_val(UnaryOperation(op, Number(i))),
-                                 self.__ops[op](i))
+    def test_neg(self):
+        for i in range(-10, 10):
+            self.assertEqual(bool(self.get_val(UnaryOperation('!', Number(i)))),
+                             not i)
 
 
 class FunctionTest(TestTemplate):
