@@ -89,40 +89,40 @@ class ReadTest(TestTemplate):
 
 class ConditionalTest(TestTemplate):
     def test_false_none_underfull(self):
-        Conditional(Number(0), None)
+        Conditional(Number(0), None).evaluate(self.scope)
 
     def test_true_none_underfull(self):
-        Conditional(Number(1), None)
+        Conditional(Number(1), None).evaluate(self.scope)
 
     def test_false_underfull(self):
-        Conditional(Number(0), [])
+        Conditional(Number(0), []).evaluate(self.scope)
 
     def test_true_underfull(self):
-        Conditional(Number(1), [])
+        Conditional(Number(1), []).evaluate(self.scope)
 
     def test_false_empties(self):
-        Conditional(Number(0), [], [])
+        Conditional(Number(0), [], []).evaluate(self.scope)
 
     def test_true_empties(self):
-        Conditional(Number(1), [], [])
+        Conditional(Number(1), [], []).evaluate(self.scope)
 
     def test_false_nones(self):
-        Conditional(Number(0), None, None)
+        Conditional(Number(0), None, None).evaluate(self.scope)
 
     def test_true_nones(self):
-        Conditional(Number(17), None, None)
+        Conditional(Number(17), None, None).evaluate(self.scope)
 
     def test_false_comb1(self):
-        Conditional(Number(0), None, [])
+        Conditional(Number(0), None, []).evaluate(self.scope)
 
     def test_true_comb1(self):
-        Conditional(Number(48), None, [])
+        Conditional(Number(48), None, []).evaluate(self.scope)
 
     def test_false_comb2(self):
-        Conditional(Number(0), None, [])
+        Conditional(Number(0), None, []).evaluate(self.scope)
 
     def test_true_comb2(self):
-        Conditional(Number(34), None, [])
+        Conditional(Number(34), None, []).evaluate(self.scope)
 
     def test_true_none(self):
         self.assertEqual(self.get_val(Conditional(Number(-9), [Number(self.a)], None)),
