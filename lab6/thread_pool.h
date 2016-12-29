@@ -24,6 +24,7 @@ struct ThreadPool {
 void thpool_init(struct ThreadPool *pool, unsigned threads_nm);
 void thpool_submit(struct ThreadPool *pool, struct Task *task);
 void thpool_wait(struct Task *task);
+void thpool_wait_for_all(struct Task *task);
 void thpool_finit(struct ThreadPool *pool);
 
 #endif

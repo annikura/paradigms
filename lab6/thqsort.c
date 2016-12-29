@@ -1,3 +1,4 @@
+#include <stdio.h>
 #include "thqsort.h"
 #include "thread_pool.h"
 
@@ -14,48 +15,54 @@ int cmp(const void *a, const void *b){
     return (x < y ? -1 : 1);
 }
 
-struct q_arg create_qarg(int *l, int * r, int left, struct ThreadPool *pool){
+void tree_wait_for_all(struct Task *task){
+    if (!task)
+        return;
+    if (!task->finished)
+        thpool_wait(task);
+    tree_wait_for_all(((struct q_arg*)task->arg)->lc);
+    tree_wait_for_all(((struct q_arg*)task->arg)->rc);
+    free(task->arg), free(task);
+}
+
+struct q_arg create_qarg(int *st, int len, int left, struct ThreadPool *pool){
     struct q_arg arg;
-    arg.l = l;
-    arg.r = r;
+    arg.st = st;
+    arg.len = len;
     arg.left = left;
     arg.pool = pool;
+    arg.lc = NULL, arg.rc = NULL;
     return arg;
 }
 
-struct Task *create_qtask(int *l, int *r, int left, struct ThreadPool *pool){
+struct Task *create_qtask(int *st, int len, int left, struct ThreadPool *pool){
     struct Task *task = malloc(sizeof(struct Task));
 
     task->arg = malloc(sizeof(struct q_arg));
-    *(struct q_arg*)task->arg = create_qarg(l, r, left, pool);
+    *(struct q_arg*)task->arg = create_qarg(st, len, left, pool);
 
     task->f = thsort;
     return task;
 }
 
 void thsort(void *data){
-    struct q_arg *arg = data, tmp;
-    int *pointer, *i;
-    struct Task *task;
+    struct q_arg *arg = data;
+    int pointer = 0, i, mid = arg->len / 2;
+    struct Task *task1, *task2;
 
-    if (arg->l >= arg->r - 1)
-        return;
-    if (arg->left){
-        qsort(arg->l, arg->r - arg->l, sizeof(int), cmp);
+    if (arg->left == 0 || arg->len < 4096){
+        if (arg->len > 1)
+            qsort(arg->st, arg->len, sizeof(int), cmp);
         return;
     }
 
-    pointer = arg->l;
-    for (i = arg->l; i < arg->r; i++)
-        if (*i <= *arg->l)
-            swap(i, pointer++);
+    for (i = 0; i < arg->len; i++)
+        if (arg->st[i] <= arg->st[mid])
+            swap(arg->st + i, arg->st + pointer++);
 
-    task = create_qtask(pointer, arg->r, arg->left - 1, arg->pool);
-    thpool_submit(arg->pool, task);
-
-    tmp = create_qarg(arg->l, pointer, arg->left - 1, arg->pool);
-    thsort((void *)&tmp);
-
-    thpool_wait(task);
-    free(task->arg), free(task);
+    task1 = create_qtask(arg->st, pointer, arg->left - 1, arg->pool);
+    task2 = create_qtask(arg->st + pointer, arg->len - pointer, arg->left - 1, arg->pool);
+    arg->lc = task1, arg->rc = task2;
+    thpool_submit(arg->pool, task1);
+    thpool_submit(arg->pool, task2);
 }

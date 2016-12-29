@@ -25,21 +25,19 @@ int main(int argc, char **argv) {
         a[i] = rand();
     }
 
-    task = create_qtask(a, a + len, rec_lim, &pool);
+    task = create_qtask(a, len, rec_lim, &pool);
 
     thpool_init(&pool, threads);
     thpool_submit(&pool, task);
-    thpool_wait(task);
+    tree_wait_for_all(task);
     thpool_finit(&pool);
 
     for (i = 1; i < len; i++)
         if (a[i - 1] > a[i]){
-            printf("Fu!\n");
+            printf("It's not sorted\n");
             return 0;
         }
 
     free(a);
-    free(task->arg);
-    free(task);
     return 0;
 }

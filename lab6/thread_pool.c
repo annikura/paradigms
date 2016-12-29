@@ -11,7 +11,6 @@ void thpool_init(struct ThreadPool *pool, unsigned threads_nm) {
     unsigned i;
     pool->threads_nm = threads_nm;
     pool->threads = malloc(sizeof(pthread_t) * threads_nm);
-
     wsqueue_init(&pool->tasks);
     for (i = 0; i < threads_nm; i++) {
         assert(pthread_create(&pool->threads[i], NULL, thpool_go, pool) == 0);
@@ -31,8 +30,8 @@ void thpool_wait(struct Task *task) {
         pthread_cond_wait(&task->finished_cond, &task->guard);
     }
     pthread_mutex_unlock(&task->guard);
-    pthread_cond_destroy(&task->finished_cond);
     pthread_mutex_destroy(&task->guard);
+    pthread_cond_destroy(&task->finished_cond);
 }
 
 void thpool_finit(struct ThreadPool *pool) {
