@@ -1,34 +1,29 @@
-#ifndef _THREAD_POOL_H
-#define _THREAD_POOL_H
+#ifndef __THREAD_POOL_H__
+#define __THREAD_POOL_H__
 
-#include "squeue.h"
+#include <stdbool.h>
+#include <pthread.h>
+#include "wsqueue.h"
 
-struct Task{
-    void (*f)(void *);
-    void* arg;
+struct Task {
+    struct list_node node;
+    void (*f)(void*);
+    void *arg;
+
+    pthread_mutex_t guard;
+    pthread_cond_t finished_cond;
+    bool finished;
 };
 
-struct ThreadPool{
-    pthread_t *ths;
-    size_t threads_nm;
-    struct squeue tasks;
-    pthread_cond_t cond;
-    int left;
-    int destruction_time;
+struct ThreadPool {
+   unsigned threads_nm;
+   pthread_t *threads;
+   struct wsqueue tasks;
 };
 
-void thpool_init(struct ThreadPool* pool, size_t threads_nm);
-// инициализирует пул потоков, threads_nm -- число потоков
-void thpool_submit(struct ThreadPool* pool, struct Task* task);
-// добавляет задачу на выполнение в пул потоков
-void thpool_wait(struct Task* task);
-// возвращает управление только после того, как задача task завершилась
-void thpool_finit(struct ThreadPool* pool);
-// финализирует пул потоков, дожидается завершения всех задач в пуле,
-// затем освобождает ресурсы, потребляемые пулом потоков
+void thpool_init(struct ThreadPool *pool, unsigned threads_nm);
+void thpool_submit(struct ThreadPool *pool, struct Task *task);
+void thpool_wait(struct Task *task);
+void thpool_finit(struct ThreadPool *pool);
 
-void do_smth(void *data);
-void *sit_and_wait(void *data);
-
-
-#endif //_THREAD_POOL_H
+#endif

@@ -4,8 +4,8 @@
 #include "squeue.h"
 
 struct wsqueue {
-    struct squeue squeue;
-    pthread_cond_t cond;
+	struct squeue squeue;
+	pthread_cond_t cond;
 };
 
 void wsqueue_init(struct wsqueue *queue);
@@ -18,4 +18,4 @@ int wsqueue_wait(struct wsqueue *queue);
 void wsqueue_notify(struct wsqueue *queue);
 void wsqueue_notify_all(struct wsqueue *queue);
 
-#endif /*__WSQUEUE_H__*/
+#endif

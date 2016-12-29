@@ -1,16 +1,45 @@
 #include <stdlib.h>
+#include <stdio.h>
 
-int main(int *argc, char **argv) {
-    int     treads = atoi(argv[1]),
-            len = atoi(argv[2]),
-            rec_lim = atoi(argv[3]),
-            i;
-    int *a = malloc(sizeof(int) * len);
+#include "thqsort.h"
+#include "wsqueue.h"
+#include "thread_pool.h"
+
+int main(int argc, char **argv) {
+    struct ThreadPool pool;
+    struct Task * task;
+    int threads, len, rec_lim, i, *a;
+
+    if (argc != 4){
+        printf("Something's wrong...\n");
+        return 0;
+    }
+
+    threads = atoi(argv[1]);
+    len = atoi(argv[2]);
+    rec_lim = atoi(argv[3]);
+
+    a = malloc(sizeof(int) * len);
     srand(42);
-
-    for (i = 0; i < len; i++)
+    for (i = 0; i < len; i++){
         a[i] = rand();
+    }
+
+    task = create_qtask(a, a + len, rec_lim, &pool);
+
+    thpool_init(&pool, threads);
+    thpool_submit(&pool, task);
+    thpool_wait(task);
+    thpool_finit(&pool);
+
+    for (i = 1; i < len; i++)
+        if (a[i - 1] > a[i]){
+            printf("Fu!\n");
+            return 0;
+        }
 
     free(a);
+    free(task->arg);
+    free(task);
     return 0;
 }
