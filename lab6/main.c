@@ -12,7 +12,7 @@ int main(int argc, char **argv) {
 
     if (argc != 4){
         printf("Something's wrong...\n");
-        return 0;
+        return 1;
     }
 
     threads = atoi(argv[1]);
@@ -35,6 +35,7 @@ int main(int argc, char **argv) {
     for (i = 1; i < len; i++)
         if (a[i - 1] > a[i]){
             printf("It's not sorted\n");
+            return 2;
         }
 
     free(a);

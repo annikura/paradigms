@@ -25,22 +25,20 @@ void tree_wait_for_all(struct Task *task){
     free(task->arg), free(task);
 }
 
-struct q_arg create_qarg(int *st, int len, int left, struct ThreadPool *pool){
-    struct q_arg arg;
-    arg.st = st;
-    arg.len = len;
-    arg.left = left;
-    arg.pool = pool;
-    arg.lc = NULL, arg.rc = NULL;
+struct q_arg *create_qarg(int *st, int len, int left, struct ThreadPool *pool){
+    struct q_arg *arg;
+    arg = malloc(sizeof(struct q_arg));
+    arg->st = st;
+    arg->len = len;
+    arg->left = left;
+    arg->pool = pool;
+    arg->lc = NULL, arg->rc = NULL;
     return arg;
 }
 
 struct Task *create_qtask(int *st, int len, int left, struct ThreadPool *pool){
     struct Task *task = malloc(sizeof(struct Task));
-
-    task->arg = malloc(sizeof(struct q_arg));
-    *(struct q_arg*)task->arg = create_qarg(st, len, left, pool);
-
+    task->arg = (void *)create_qarg(st, len, left, pool);
     task->f = thsort;
     return task;
 }

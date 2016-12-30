@@ -5,7 +5,7 @@
 #include <pthread.h>
 #include "wsqueue.h"
 
-struct Task {
+struct Task{
     struct list_node node;
     void (*f)(void*);
     void *arg;
@@ -15,7 +15,7 @@ struct Task {
     bool finished;
 };
 
-struct ThreadPool {
+struct ThreadPool{
    unsigned threads_nm;
    pthread_t *threads;
    struct wsqueue tasks;
