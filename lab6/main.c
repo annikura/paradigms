@@ -35,7 +35,6 @@ int main(int argc, char **argv) {
     for (i = 1; i < len; i++)
         if (a[i - 1] > a[i]){
             printf("It's not sorted\n");
-            return 0;
         }
 
     free(a);

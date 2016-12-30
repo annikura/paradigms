@@ -47,7 +47,7 @@ struct Task *create_qtask(int *st, int len, int left, struct ThreadPool *pool){
 
 void thsort(void *data){
     struct q_arg *arg = data;
-    int pointer = 0, i, mid = arg->len / 2;
+    int pointer = 0, i, mid = arg->st[arg->len / 2];
     struct Task *task1, *task2;
 
     if (arg->left == 0 || arg->len < 4096){
@@ -57,7 +57,7 @@ void thsort(void *data){
     }
 
     for (i = 0; i < arg->len; i++)
-        if (arg->st[i] <= arg->st[mid])
+        if (arg->st[i] <= mid)
             swap(arg->st + i, arg->st + pointer++);
 
     task1 = create_qtask(arg->st, pointer, arg->left - 1, arg->pool);
